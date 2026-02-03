@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-validador
+
+# Configuración para Feign
+services:
+  api-persistence:
+    url: http://localhost:8081
