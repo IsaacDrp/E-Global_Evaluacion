@@ -31,7 +31,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .cliente(request.getCliente())
                 .referencia(referenciaAleatoria)
                 .estatus("Aprobada") // Leyenda obligatoria
-                .secreto(request.getSecreto())
+                .firma(request.getFirma())
                 .build();
 
         // 3. Persistencia en H2
@@ -79,7 +79,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .id(entity.getId().toString())
                 .estatus(entity.getEstatus())
                 .referencia(entity.getReferencia())
-                .operacion(entity.getOperacion())
+                .operacion(entity.getOperacion())      // Atributo operacion [cite: 23]
                 .build();
     }
 

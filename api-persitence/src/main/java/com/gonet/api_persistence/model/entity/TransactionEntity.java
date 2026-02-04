@@ -36,5 +36,5 @@ public class TransactionEntity {
     private String estatus;
 
     @Column(nullable = true)
-    private String secreto;
+    private String firma;
 }

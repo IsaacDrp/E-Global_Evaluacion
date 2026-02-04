@@ -14,5 +14,5 @@ public class TransactionRequestDTO {
     private String operacion;
     private BigDecimal importe;
     private String cliente;
-    private String secreto; // este campo corresponde a la firma
+    private String firma;
 }
