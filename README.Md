@@ -36,20 +36,19 @@ He incluido scripts en la raíz del proyecto para facilitar la validación técn
 1. Test de Flujo Completo
 
 Realiza login, calcula una firma válida, registra una venta y consulta el historial.
-sh```
+
 chmod +x test_api.sh
 ./test_api.sh
 
-```
 
 2. Test de Vulnerabilidad (Validaciones)
 
 Prueba la robustez del validador enviando datos corruptos e importes mal formados (espera respuestas 400 Bad Request).
 
-sh```
 chmod +x test_validations.sh
 ./test_validations.sh
-```
+
+
 ### Decisiones de Diseño
 
     SHA-256: Se eligió para garantizar que los datos críticos (importe/cliente) no sean alterados durante el tránsito.
