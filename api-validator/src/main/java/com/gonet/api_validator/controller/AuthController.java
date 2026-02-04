@@ -17,8 +17,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Map<String, String> credentials) {
-        String username = credentials.get("usuario"); // Campo solicitado [cite: 28, 30]
-        String password = credentials.get("password"); // Campo solicitado [cite: 29, 30]
+        String username = credentials.get("usuario");
+        String password = credentials.get("password");
 
         if (userService.authenticate(username, password)) {
             return ResponseEntity.ok("Login exitoso. Bienvenido a la siguiente ventana.");

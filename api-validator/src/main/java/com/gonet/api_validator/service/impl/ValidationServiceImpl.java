@@ -54,7 +54,6 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     public Object forwardCancel(Map<String, Object> request) {
-        // Aquí podrías agregar lógica extra, pero por ahora solo redirigimos
         return feignClient.cancelTransaction(request);
     }
 
@@ -62,7 +61,6 @@ public class ValidationServiceImpl implements ValidationService {
     public List<TransactionResponseDTO> getAll() {
         try {
             System.out.println("Solicitando historial completo a la API de Persistencia...");
-            // Cambiamos 'transactionFeignClient' por 'feignClient'
             return feignClient.findAllTransactions();
         } catch (Exception e) {
             System.err.println("Error al conectar con el microservicio de persistencia: " + e.getMessage());

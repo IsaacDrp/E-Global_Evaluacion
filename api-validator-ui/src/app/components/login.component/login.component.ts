@@ -48,7 +48,6 @@ export class LoginComponent {
     this.auth.login(usuario, password).subscribe({
       next: (response) => {
         console.log('Login exitoso:', response);
-        // Cambiamos '/transacciones' por '/registro' que es nuestra nueva ruta base
         this.router.navigate(['/registro']);
       },
       error: (err) => {
