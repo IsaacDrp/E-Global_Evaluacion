@@ -2,12 +2,15 @@ package com.gonet.api_validator.service.impl;
 
 import com.gonet.api_validator.client.TransactionFeignClient;
 import com.gonet.api_validator.model.dto.TransactionRequestDTO;
+import com.gonet.api_validator.model.dto.TransactionResponseDTO;
 import com.gonet.api_validator.service.ValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Collections;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -50,9 +53,20 @@ public class ValidationServiceImpl implements ValidationService {
         }
     }
 
-
     public Object forwardCancel(Map<String, Object> request) {
         // Aquí podrías agregar lógica extra, pero por ahora solo redirigimos
         return feignClient.cancelTransaction(request);
+    }
+
+    @Override
+    public List<TransactionResponseDTO> getAll() {
+        try {
+            System.out.println("Solicitando historial completo a la API de Persistencia...");
+            // Cambiamos 'transactionFeignClient' por 'feignClient'
+            return feignClient.findAllTransactions();
+        } catch (Exception e) {
+            System.err.println("Error al conectar con el microservicio de persistencia: " + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 }

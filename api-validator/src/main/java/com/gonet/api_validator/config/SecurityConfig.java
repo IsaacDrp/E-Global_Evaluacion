@@ -2,15 +2,18 @@ package com.gonet.api_validator.config;
 
 import com.gonet.api_validator.model.entity.UserEntity;
 import com.gonet.api_validator.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,34 +28,51 @@ import java.util.Collections;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final UserRepository userRepository;
+
+    public SecurityConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Habilita CORS
-                .csrf(AbstractHttpConfigurer::disable) // Deshabilita CSRF para APIs REST
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Permitimos el acceso libre al login y a la consola de H2
+                        // 1. IMPORTANTE: Permitir OPTIONS para que el navegador valide el CORS sin pedir login
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // 2. Permitir acceso libre al login y consola H2
                         .requestMatchers("/api/v1/auth/**", "/h2-console/**").permitAll()
-                        // Protegemos las operaciones de negocio: deben estar autenticadas
+                        // 3. Todo lo demás requiere que el usuario esté autenticado
                         .requestMatchers("/api/v1/validator/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                // Usamos autenticación básica para las pruebas post-login
                 .httpBasic(Customizer.withDefaults())
-                // Necesario para que la consola de H2 se vea correctamente en el navegador
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
 
         return http.build();
     }
 
     @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> userRepository.findByUsuario(username)
+                .map(user -> User.withUsername(user.getUsuario())
+                        .password(user.getPassword())
+                        .authorities("USER")
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+    }
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permitimos el origen del frontend Angular
         configuration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-        configuration.setAllowCredentials(true); // Permite enviar credenciales/cookies
+        // Se agregan los headers necesarios para Basic Auth y JSON
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Cache de la respuesta OPTIONS
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -67,12 +87,13 @@ public class SecurityConfig {
     @Bean
     CommandLineRunner initDatabase(UserRepository repository, PasswordEncoder encoder) {
         return args -> {
-            // Limpiamos y creamos el usuario de prueba
             repository.deleteAll();
             repository.save(UserEntity.builder()
                     .usuario("isaacdp")
                     .password(encoder.encode("contra123"))
                     .build());
+            System.out.println("--- BASE DE DATOS INICIALIZADA ---");
+            System.out.println("Usuario: isaacdp | Password: contra123");
         };
     }
 }

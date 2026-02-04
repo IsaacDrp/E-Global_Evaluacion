@@ -1,0 +1,40 @@
+<div class="container mt-4 animate__animated animate__fadeIn">
+  <div class="card shadow border-0">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Historial de Transacciones</h4>
+      <button (click)="cargarTransacciones()" class="btn btn-sm btn-info text-white">
+        Actualizar Datos
+      </button>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Referencia</th>
+            <th>Operación</th>
+            <th class="text-center">Estatus</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of transacciones">
+            <td class="ps-4"><strong>#{{ t.id }}</strong></td>
+            <td><code>{{ t.referencia }}</code></td>
+            <td class="text-uppercase small">{{ t.operacion }}</td>
+            <td class="text-center">
+              <span class="badge" 
+                    [ngClass]="t.estatus === 'cancelada' ? 'bg-danger' : 'bg-success'">
+                {{ t.estatus | uppercase }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="transacciones.length === 0">
+            <td colspan="4" class="text-center py-4 text-muted">
+              No se encontraron registros en el sistema.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

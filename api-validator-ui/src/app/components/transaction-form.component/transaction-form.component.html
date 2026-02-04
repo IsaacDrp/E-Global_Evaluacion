@@ -1,0 +1,103 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      
+      <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white text-center py-3">
+          <h4 class="mb-0">Registro de Operación</h4>
+        </div>
+        <div class="card-body p-4">
+          <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold">Tipo de Operación</label>
+              <input type="text" 
+                     formControlName="operacion" 
+                     class="form-control" 
+                     placeholder="venta o cancelacion"
+                     [class.is-invalid]="transactionForm.get('operacion')?.invalid && transactionForm.get('operacion')?.touched">
+              <div class="invalid-feedback">
+                Solo se permite 'venta' o 'cancelacion'.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Importe (0.00)</label>
+              <input type="text" 
+                     formControlName="importe" 
+                     class="form-control" 
+                     placeholder="100.00"
+                     [class.is-invalid]="transactionForm.get('importe')?.invalid && transactionForm.get('importe')?.touched">
+              <div class="invalid-feedback">
+                Formato requerido: números con dos decimales (ej. 150.50).
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nombre del Cliente</label>
+              <input type="text" 
+                     formControlName="cliente" 
+                     class="form-control" 
+                     placeholder="Nombre del cliente"
+                     [class.is-invalid]="transactionForm.get('cliente')?.invalid && transactionForm.get('cliente')?.touched">
+              <div class="invalid-feedback">
+                El nombre debe tener al menos 3 caracteres.
+              </div>
+            </div>
+
+            <button type="submit" 
+                    [disabled]="transactionForm.invalid || loading" 
+                    class="btn btn-success w-100 py-2 fw-bold d-flex align-items-center justify-content-center">
+              
+              <span *ngIf="loading" 
+                    class="spinner-border spinner-border-sm me-2" 
+                    role="status" 
+                    aria-hidden="true">
+              </span>
+
+              <span>
+                {{ loading ? 'Validando Firma y Enviando...' : 'Generar Firma y Enviar' }}
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div *ngIf="resultado && !loading" class="mt-4 card border-success shadow-sm animate__animated animate__fadeIn">
+        <div class="card-body text-center bg-success-subtle">
+          <i class="bi bi-check-circle-fill text-success fs-1"></i>
+          <h5 class="mt-2 text-success fw-bold">¡Transacción Registrada con Éxito!</h5>
+          <hr>
+          <div class="text-start px-3">
+            <p class="mb-1"><strong>ID Sistema:</strong> #{{resultado.id}}</p>
+            <p class="mb-1"><strong>Referencia:</strong> <code>{{resultado.referencia}}</code></p>
+            <p class="mb-0"><strong>Estatus:</strong> <span class="badge bg-success">{{resultado.estatus}}</span></p>
+          </div>
+          <button (click)="resetForm()" class="btn btn-outline-success btn-sm mt-3">Registrar otra venta</button>
+        </div>
+      </div>
+
+      <div *ngIf="errorCatUrl && !loading" class="mt-4 card border-danger shadow-sm animate__animated animate__shakeX">
+        <div class="card-header bg-danger text-white text-center">
+          <h5 class="mb-0">Falla en la Validación del Servidor</h5>
+        </div>
+        <div class="card-body text-center bg-light">
+          <img [src]="errorCatUrl" 
+               alt="Error Cat" 
+               class="img-fluid rounded shadow-sm mb-3" 
+               style="max-height: 280px; width: auto;">
+          
+          <p class="text-danger fw-bold mb-1">Código de Error Detectado</p>
+          <p class="small text-muted mb-3 px-3">
+            La firma SHA-256 no coincide o los datos no cumplen con las reglas del validador.
+          </p>
+          
+          <div class="d-grid gap-2 d-md-block">
+            <button (click)="errorCatUrl = null" class="btn btn-danger btn-sm px-4">Intentar de nuevo</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

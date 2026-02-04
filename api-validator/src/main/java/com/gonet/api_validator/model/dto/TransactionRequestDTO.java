@@ -8,17 +8,19 @@ import lombok.Data;
 public class TransactionRequestDTO {
 
     @NotBlank(message = "La operación es obligatoria")
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "La operación solo debe contener caracteres")
-    private String operacion; // [cite: 6, 12]
+    // Solo permitimos palabras clave específicas del negocio
+    @Pattern(regexp = "^(venta|cancelacion)$", message = "Operación no permitida. Use 'venta' o 'cancelacion'")
+    private String operacion;
 
     @NotBlank(message = "El importe es obligatorio")
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "El importe debe ser un formato de moneda válido (ej: 100.00)")
-    private String importe; // [cite: 7, 12]
+    // Exactamente dos decimales para que el SHA-256 no falle
+    @Pattern(regexp = "^\\d+\\.\\d{2}$", message = "El importe debe tener formato exacto 0.00")
+    private String importe;
 
     @NotBlank(message = "El nombre del cliente es obligatorio")
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "El nombre del cliente solo debe contener caracteres")
-    private String cliente; // [cite: 8, 12]
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,50}$", message = "Nombre inválido (3-50 caracteres)")
+    private String cliente;
 
     @NotBlank(message = "La firma es obligatoria")
-    private String firma; // [cite: 9, 13]
+    private String firma;
 }
